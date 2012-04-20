@@ -4,7 +4,7 @@ var showFileSize = '';
 var displayBlock = $('<div>').appendTo('body');
 	displayBlock.css({
 		position: 'fixed',
-		padding: '0 1px',
+		padding: '1px',
 		zIndex: '9999',
 		display: 'none',
 		fontFamily: 'Lucida Console',
