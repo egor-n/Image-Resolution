@@ -14,6 +14,7 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	displayBlock.css({
 		color: response[0],
 		fontSize: response[1] + 'px',
+		lineHeight: response[1] + 'px',
 		backgroundColor: response[2],
 		border: '1px solid ' + response[3],
 		borderRadius: response[4] + 'px'
