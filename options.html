@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Image Resolution Options</title>
+	<link rel="stylesheet" href="css/options.css" type="text/css">
+	<script src="js/jquery-1.7.2.min.js"></script>
+	<script src="js/options.js"></script>
+</head>
+<body>
+	<div id="container">
+		<p class="fancyP"><input type="text" id="colorInput" class="fancyInput"> //font color (#HEX)</p>
+		<p class="fancyP"><input type="text" id="fontSizeInput" class="fancyInput"> //font size (pixels)</p>
+		<p class="fancyP"><input type="text" id="backgroundColorInput" class="fancyInput"> //background color (#HEX)</p>
+		<p class="fancyP"><input type="text" id="borderColorInput" class="fancyInput"> //border color (#HEX)</p>
+		<p class="fancyP"><input type="text" id="borderRadiusInput" class="fancyInput"> //border radius (pixels)</p>
+		<hr>
+		<p><label id="showFileSizeLabel"><input type="checkbox" id="showFileSize"> Show file size</label></p>
+		<hr>
+		<form name="displayBlockPosition" id="blockPositionForm" align="center">
+			<p style="font-size: 16px; font-weight: bold;">Position:</p>
+			<p><label><span>Top-Left</span><input name="blockPosition" type="radio" id="topLeft" style="margin-right: 35px;"></label>
+			<label><input name="blockPosition" type="radio" id="topRight"><span>Top-Right</span></label></p>
+			<p><label><span>Bottom-Left</span><input name="blockPosition" type="radio" id="bottomLeft" style="margin-right: 35px;"></label>
+			<label><input name="blockPosition" type="radio" id="bottomRight"><span>Bottom-Right</span></label></p>
+		</form>
+
+		<div id="buttons">
+			<button id="submitOptions" class="formButton">Save</button>
+			<button id="defaultOptions" class="formButton">Default</button>
+		</div>
+	</div>
+</body>
+</html>

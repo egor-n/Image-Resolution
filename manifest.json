@@ -1,0 +1,26 @@
+{
+  "name": "Image Resolution",
+  "version": "0.3.1",
+  "manifest_version": 2,
+  "description": "Extension shows image size on hover in a minimalistic way",
+  "icos": {
+  	"48": "icon48.png",
+  	"128": "icon128.png"
+  },
+  "options_page": "options.html",
+  "background": {
+    "page": "background.html"
+  },
+  "content_scripts": [
+    {
+  	  "matches": ["http://*/*", "https://*/*"],
+      "js": ["js/jquery-1.7.2.min.js", "js/content.js"],
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "https://*/*" 
+  ]
+}
