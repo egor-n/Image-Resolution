@@ -46,8 +46,6 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	}
 });
 
-localStorage['firstStart'] = 'false';
-
 $('img').on('mouseenter', function() {
 	var image = this;
 	var imageSource = this.src;
