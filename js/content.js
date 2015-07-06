@@ -47,7 +47,7 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	}
 });
 
-$('img').on('mouseenter', function() {
+$(document).on('mouseenter', 'img', function() {
 	var image = this;
 	var imageSource = this.src;
 
@@ -84,6 +84,6 @@ $('img').on('mouseenter', function() {
 	$(displayBlock).fadeIn(70);
 });
 
-$('img').on('mouseleave', function() {
+$(document).on('mouseleave', 'img', function() {
 	$(displayBlock).fadeOut(10);
 });
