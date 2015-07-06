@@ -135,7 +135,7 @@ function updateBlock(image, byteCount) {
 	}
 }
 
-$(document).on('mouseenter', 'img', function() {
+$(document).on('mouseover', 'img', function() {
 	var image = this;
 	var imageSource = this.src;
 
@@ -154,7 +154,7 @@ $(document).on('mouseenter', 'img', function() {
 	$(displayBlock).fadeIn(70);
 });
 
-$(document).on('mouseleave', 'img', function(e) {
+$(document).on('mouseout', 'img', function(e) {
 	var isMetaKey = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
 	if (isMetaKey) {
 		return;
