@@ -75,8 +75,7 @@ $(document).on('mouseenter', 'img', function() {
 					updateBlock((fileSizeBytes / 1048576).toFixed(2) + ' Mb');
 				}
 			}
-
-		});	
+		});
 	}
 
 	displayBlock.text(this.width + 'x' + this.height);
