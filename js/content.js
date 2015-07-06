@@ -25,25 +25,26 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 			displayBlock.css({
 				top: '1px',
 				left: '1px'
-			})
-			break
+			});
+			break;
 		case 'topRight':
 			displayBlock.css({
 				top: '1px',
 				right: '1px'
-			})
-			break
+			});
+			break;
 		case 'bottomLeft':
 			displayBlock.css({
 				bottom: '1px',
 				left: '1px'
-			})
-			break
+			});
+			break;
 		case 'bottomRight':
 			displayBlock.css({
 				bottom: '1px',
 				right: '1px'
-			})
+			});
+			break;
 	}
 });
 
