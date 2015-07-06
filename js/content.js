@@ -70,9 +70,9 @@ $(document).on('mouseenter', 'img', function() {
 				} else if (fileSizeBytes < 1024) {
 					updateBlock(fileSizeBytes + ' B');
 				} else if (fileSizeBytes / 1024 < 1024) {
-					updateBlock((fileSizeBytes / 1024).toFixed(2) + ' Kb');
+					updateBlock((fileSizeBytes / 1024).toFixed(2) + ' KiB');
 				} else {
-					updateBlock((fileSizeBytes / 1048576).toFixed(2) + ' Mb');
+					updateBlock((fileSizeBytes / 1048576).toFixed(2) + ' MiB');
 				}
 			}
 		});
