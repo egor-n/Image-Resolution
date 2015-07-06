@@ -7,7 +7,7 @@ var displayBlock = $('<div>').appendTo('body');
 		padding: '1px',
 		zIndex: '9999',
 		display: 'none',
-		fontFamily: 'Lucida Console',
+		fontFamily: 'Consolas, "Lucida Console", "Courier New", Courier, monospace',
 	});
 
 chrome.extension.sendRequest(optionsGet, function(response) {
