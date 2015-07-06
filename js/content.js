@@ -66,6 +66,16 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	}
 });
 
+function getByteCount(imageSource, jqXHR) {
+	var byteCount = jqXHR.getResponseHeader('Content-length');
+	var dataUriMatch = /^data:image\/[\w.+-]+(;base64)?,/.exec(imageSource);
+	if (dataUriMatch) {
+		var dataUriContent = imageSource.substr(dataUriMatch[0].length);
+		byteCount = dataUriContent.length;
+	}
+	return byteCount;
+}
+
 function getFileSize(byteCount) {
 	var value;
 	var unit;
@@ -130,11 +140,11 @@ $(document).on('mouseenter', 'img', function() {
 	var imageSource = this.src;
 
 	if (showFileSize == 'on') {
-		var requestSize = $.ajax({
+		$.ajax({
 			type: 'HEAD',
 			url: imageSource,
-			success: function() {
-				updateBlock(image, requestSize.getResponseHeader('Content-length'));
+			success: function(data, textStatus, jqXHR) {
+				updateBlock(image, getByteCount(imageSource, jqXHR));
 			}
 		});
 	}
