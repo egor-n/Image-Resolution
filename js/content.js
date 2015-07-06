@@ -65,7 +65,9 @@ $(document).on('mouseenter', 'img', function() {
 					}
 				}
 
-				if (fileSizeBytes < 1024) {
+				if (fileSizeBytes == null) {
+					return;
+				} else if (fileSizeBytes < 1024) {
 					updateBlock(fileSizeBytes + ' B');
 				} else if (fileSizeBytes / 1024 < 1024) {
 					updateBlock((fileSizeBytes / 1024).toFixed(2) + ' Kb');
