@@ -1,14 +1,32 @@
 var options = [];
 var optionsGet = 'options';
 var showFileSize = '';
-var displayBlock = $('<div>').appendTo('body');
-	displayBlock.css({
-		position: 'fixed',
-		padding: '1px',
-		zIndex: '9999',
-		display: 'none',
-		fontFamily: 'Consolas, "Lucida Console", "Courier New", Courier, monospace',
-	});
+var displayBlockMarkup =
+	'<div id="ir-ext-ui" dir="ltr">' +
+	'  <div class="ir-ext-dimensions">' +
+	'    <span class="ir-ext-rendered">' +
+	'      <span data-ir-ext-width></span>x<span data-ir-ext-height></span>' +
+	'    </span>' +
+	'    <span class="ir-ext-natural">' +
+	'      (<span data-ir-ext-width></span>x<span data-ir-ext-height></span>)' +
+	'    </span>' +
+	'  </div>' +
+	'  <div class="ir-ext-filesize">' +
+	'    <span data-ir-ext-value></span>' +
+	'    <span data-ir-ext-unit></span>' +
+	'  </div>' +
+	'  <style>' +
+	'    #ir-ext-ui {' +
+	'      position: fixed;' +
+	'      padding: 1px;' +
+	'      z-index: 9999;' +
+	'      display: none;' +
+	'      font-family: Consolas, "Lucida Console", "Courier New", Courier, monospace;' +
+	'      text-align: right;' +
+	'    }' +
+	'  </style>' +
+	'</div>';
+var displayBlock = $(displayBlockMarkup).appendTo(document.body);
 
 chrome.extension.sendRequest(optionsGet, function(response) {
 	displayBlock.css({
@@ -48,6 +66,65 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	}
 });
 
+function getFileSize(byteCount) {
+	var value;
+	var unit;
+
+	if (byteCount < 1024) {
+		value = byteCount;
+		unit = 'B';
+	} else if (byteCount / 1024 < 1024) {
+		value = (byteCount / 1024).toFixed(2);
+		unit = 'KiB';
+	} else {
+		value = (byteCount / (1024 * 1024)).toFixed(2);
+		unit = 'MiB';
+	}
+
+	return {
+		value: value,
+		unit: unit
+	};
+}
+
+function updateDimensions(container, width, height) {
+	container.find('[data-ir-ext-width]').text(width);
+	container.find('[data-ir-ext-height]').text(height);
+}
+
+function updateFileSize(container, byteCount) {
+	var fileSize = getFileSize(byteCount);
+	container.find('[data-ir-ext-value]').text(fileSize.value);
+	container.find('[data-ir-ext-unit]').text(fileSize.unit);
+}
+
+function updateBlock(image, byteCount) {
+	var isScaled = image.width != image.naturalWidth || image.height != image.naturalHeight;
+	var hasFileSize = byteCount != null;
+
+	var rendered = displayBlock.find('.ir-ext-rendered');
+	var natural = displayBlock.find('.ir-ext-natural');
+	var fileSize = displayBlock.find('.ir-ext-filesize');
+
+	updateDimensions(rendered, image.width, image.height);
+
+	if (isScaled) {
+		updateDimensions(natural, image.naturalWidth, image.naturalHeight);
+		natural.show();
+	} else {
+		natural.hide();
+		updateDimensions(natural, 0, 0);
+	}
+
+	if (hasFileSize) {
+		updateFileSize(fileSize, byteCount);
+		fileSize.show();
+	} else {
+		fileSize.hide();
+		updateFileSize(fileSize, 0);
+	}
+}
+
 $(document).on('mouseenter', 'img', function() {
 	var image = this;
 	var imageSource = this.src;
@@ -57,35 +134,20 @@ $(document).on('mouseenter', 'img', function() {
 			type: 'HEAD',
 			url: imageSource,
 			success: function() {
-				var fileSizeBytes = requestSize.getResponseHeader('Content-length');
-
-				function updateBlock(context) {
-					displayBlock.text(image.width + 'x' + image.height + ' | ' + context);
-					if (image.width != image.naturalWidth || image.height != image.naturalHeight) {
-						displayBlock.text(image.width + 'x' + image.height + ' (' + image.naturalWidth + 'x' + image.naturalHeight + ')' + ' | ' + context);
-					}
-				}
-
-				if (fileSizeBytes == null) {
-					return;
-				} else if (fileSizeBytes < 1024) {
-					updateBlock(fileSizeBytes + ' B');
-				} else if (fileSizeBytes / 1024 < 1024) {
-					updateBlock((fileSizeBytes / 1024).toFixed(2) + ' KiB');
-				} else {
-					updateBlock((fileSizeBytes / 1048576).toFixed(2) + ' MiB');
-				}
+				updateBlock(image, requestSize.getResponseHeader('Content-length'));
 			}
 		});
 	}
 
-	displayBlock.text(this.width + 'x' + this.height);
-	if (this.width != this.naturalWidth || this.height != this.naturalHeight) {
-		displayBlock.text(this.width + 'x' + this.height + ' (' + this.naturalWidth + 'x' + this.naturalHeight + ')');
-	}
+	updateBlock(image, null);
+
 	$(displayBlock).fadeIn(70);
 });
 
-$(document).on('mouseleave', 'img', function() {
+$(document).on('mouseleave', 'img', function(e) {
+	var isMetaKey = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+	if (isMetaKey) {
+		return;
+	}
 	$(displayBlock).fadeOut(10);
 });
