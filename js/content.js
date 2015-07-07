@@ -66,6 +66,18 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 	}
 });
 
+function isMetaKey(e) {
+	return e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+}
+
+function isVisible(element) {
+	if (element.jquery) {
+		element = element[0];
+	}
+	var rect = element.getBoundingClientRect();
+	return rect.width > 0 && rect.height > 0;
+}
+
 function getByteCount(imageSource, jqXHR) {
 	var byteCount = jqXHR.getResponseHeader('Content-length');
 	var dataUriMatch = /^data:image\/[\w.+-]+(;base64)?,/.exec(imageSource);
@@ -135,7 +147,11 @@ function updateBlock(image, byteCount) {
 	}
 }
 
-$(document.body).on('mouseover', 'img', function() {
+$(document.body).on('mouseover', 'img', function(e) {
+	if (isMetaKey(e) && isVisible(displayBlock)) {
+		return;
+	}
+
 	var image = this;
 	var imageSource = this.src;
 
@@ -155,8 +171,7 @@ $(document.body).on('mouseover', 'img', function() {
 });
 
 $(document.body).on('mouseout', 'img', function(e) {
-	var isMetaKey = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
-	if (isMetaKey) {
+	if (isMetaKey(e)) {
 		return;
 	}
 	$(displayBlock).fadeOut(10);
