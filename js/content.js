@@ -167,12 +167,12 @@ $(document.body).on('mouseover', 'img', function(e) {
 
 	updateBlock(image, null);
 
-	$(displayBlock).fadeIn(70);
+	displayBlock.fadeIn(70);
 });
 
 $(document.body).on('mouseout', 'img', function(e) {
 	if (isMetaKey(e)) {
 		return;
 	}
-	$(displayBlock).fadeOut(10);
+	displayBlock.fadeOut(10);
 });
