@@ -13,7 +13,7 @@ var displayBlockMarkup =
 	'  </div>' +
 	'  <div class="ir-ext-filesize">' +
 	'    <span data-ir-ext-value></span>' +
-	'    <span data-ir-ext-unit></span>' +
+	'    <abbr data-ir-ext-unit></abbr>' +
 	'  </div>' +
 	'  <style>' +
 	'    #ir-ext-ui {' +
@@ -90,22 +90,27 @@ function getByteCount(imageSource, jqXHR) {
 
 function getFileSize(byteCount) {
 	var value;
-	var unit;
+	var unitName;
+	var unitTitle;
 
 	if (byteCount < 1024) {
 		value = byteCount;
-		unit = 'B';
+		unitName = 'B';
+		unitTitle = 'Byte'
 	} else if (byteCount / 1024 < 1024) {
 		value = (byteCount / 1024).toFixed(2);
-		unit = 'KiB';
+		unitName = 'KiB';
+		unitTitle = 'Kibibyte: 1 KiB = 2^10 (1024) bytes'
 	} else {
 		value = (byteCount / (1024 * 1024)).toFixed(2);
-		unit = 'MiB';
+		unitName = 'MiB';
+		unitTitle = 'Mebibyte: 1 MiB = 2^20 (1048576) bytes'
 	}
 
 	return {
 		value: value,
-		unit: unit
+		unitName: unitName,
+		unitTitle: unitTitle
 	};
 }
 
@@ -116,8 +121,12 @@ function updateDimensions(container, width, height) {
 
 function updateFileSize(container, byteCount) {
 	var fileSize = getFileSize(byteCount);
-	container.find('[data-ir-ext-value]').text(fileSize.value);
-	container.find('[data-ir-ext-unit]').text(fileSize.unit);
+	container.find('[data-ir-ext-value]')
+		.text(fileSize.value)
+		.attr('title', byteCount + ' bytes');
+	container.find('[data-ir-ext-unit]')
+		.text(fileSize.unitName)
+		.attr('title', fileSize.unitTitle);
 }
 
 function updateBlock(image, byteCount) {
