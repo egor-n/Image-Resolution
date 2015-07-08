@@ -4,10 +4,10 @@ var showFileSize = '';
 var displayBlockMarkup =
 	'<div id="ir-ext-ui">' +
 	'  <div class="ir-ext-dimensions">' +
-	'    <span class="ir-ext-rendered" title="Rendered image dimensions (after any scaling/resizing has been applied).">' +
+	'    <span class="ir-ext-rendered" title="Rendered image dimensions (after any scaling/resizing has been applied)">' +
 	'      <span data-ir-ext-width></span>x<span data-ir-ext-height></span>' +
 	'    </span>' +
-	'    <span class="ir-ext-natural" title="Natural image dimensions (without applying any scaling/resizing).">' +
+	'    <span class="ir-ext-natural" title="Natural image dimensions (without applying any scaling/resizing)">' +
 	'      (<span data-ir-ext-width></span>x<span data-ir-ext-height></span>)' +
 	'    </span>' +
 	'  </div>' +
