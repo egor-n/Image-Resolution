@@ -2,7 +2,7 @@ var options = [];
 var optionsGet = 'options';
 var showFileSize = '';
 var displayBlockMarkup =
-	'<div id="ir-ext-ui" dir="ltr">' +
+	'<div id="ir-ext-ui">' +
 	'  <div class="ir-ext-dimensions">' +
 	'    <span class="ir-ext-rendered" title="Rendered image dimensions (after any scaling/resizing has been applied).">' +
 	'      <span data-ir-ext-width></span>x<span data-ir-ext-height></span>' +
