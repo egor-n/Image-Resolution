@@ -1,14 +1,32 @@
 var options = [];
 var optionsGet = 'options';
 var showFileSize = '';
-var displayBlock = $('<div>').appendTo('body');
-	displayBlock.css({
-		position: 'fixed',
-		padding: '1px',
-		zIndex: '9999',
-		display: 'none',
-		fontFamily: 'Lucida Console',
-	});
+var displayBlockMarkup =
+	'<div id="ir-ext-ui">' +
+	'  <div class="ir-ext-dimensions">' +
+	'    <span class="ir-ext-rendered" title="Rendered image dimensions (after any scaling/resizing has been applied)">' +
+	'      <span data-ir-ext-width></span>x<span data-ir-ext-height></span>' +
+	'    </span>' +
+	'    <span class="ir-ext-natural" title="Natural image dimensions (without applying any scaling/resizing)">' +
+	'      (<span data-ir-ext-width></span>x<span data-ir-ext-height></span>)' +
+	'    </span>' +
+	'  </div>' +
+	'  <div class="ir-ext-filesize">' +
+	'    <span data-ir-ext-value></span>' +
+	'    <abbr data-ir-ext-unit></abbr>' +
+	'  </div>' +
+	'  <style>' +
+	'    #ir-ext-ui {' +
+	'      position: fixed;' +
+	'      padding: 1px;' +
+	'      z-index: 9999;' +
+	'      display: none;' +
+	'      font-family: Consolas, "Lucida Console", "Courier New", Courier, monospace;' +
+	'      text-align: right;' +
+	'    }' +
+	'  </style>' +
+	'</div>';
+var displayBlock = $(displayBlockMarkup).appendTo(document.body);
 
 chrome.extension.sendRequest(optionsGet, function(response) {
 	displayBlock.css({
@@ -25,65 +43,145 @@ chrome.extension.sendRequest(optionsGet, function(response) {
 			displayBlock.css({
 				top: '1px',
 				left: '1px'
-			})
-			break
+			});
+			break;
 		case 'topRight':
 			displayBlock.css({
 				top: '1px',
 				right: '1px'
-			})
-			break
+			});
+			break;
 		case 'bottomLeft':
 			displayBlock.css({
 				bottom: '1px',
 				left: '1px'
-			})
-			break
+			});
+			break;
 		case 'bottomRight':
 			displayBlock.css({
 				bottom: '1px',
 				right: '1px'
-			})
+			});
+			break;
 	}
 });
 
-$('img').on('mouseenter', function() {
+function isMetaKey(e) {
+	return e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+}
+
+function isVisible(element) {
+	if (element.jquery) {
+		element = element[0];
+	}
+	var rect = element.getBoundingClientRect();
+	return rect.width > 0 && rect.height > 0;
+}
+
+function getByteCount(imageSource, jqXHR) {
+	var byteCount = jqXHR.getResponseHeader('Content-length');
+	var dataUriMatch = /^data:image\/[\w.+-]+(;base64)?,/.exec(imageSource);
+	if (dataUriMatch) {
+		var dataUriContent = imageSource.substr(dataUriMatch[0].length);
+		byteCount = dataUriContent.length;
+	}
+	return byteCount;
+}
+
+function getFileSize(byteCount) {
+	var value;
+	var unitName;
+	var unitTitle;
+
+	if (byteCount < 1024) {
+		value = byteCount;
+		unitName = 'B';
+		unitTitle = 'Byte'
+	} else if (byteCount / 1024 < 1024) {
+		value = (byteCount / 1024).toFixed(2);
+		unitName = 'KiB';
+		unitTitle = 'Kibibyte: 1 KiB = 2^10 (1024) bytes'
+	} else {
+		value = (byteCount / (1024 * 1024)).toFixed(2);
+		unitName = 'MiB';
+		unitTitle = 'Mebibyte: 1 MiB = 2^20 (1048576) bytes'
+	}
+
+	return {
+		value: value,
+		unitName: unitName,
+		unitTitle: unitTitle
+	};
+}
+
+function updateDimensions(container, width, height) {
+	container.find('[data-ir-ext-width]').text(width);
+	container.find('[data-ir-ext-height]').text(height);
+}
+
+function updateFileSize(container, byteCount) {
+	var fileSize = getFileSize(byteCount);
+	container.find('[data-ir-ext-value]')
+		.text(fileSize.value)
+		.attr('title', byteCount + ' bytes');
+	container.find('[data-ir-ext-unit]')
+		.text(fileSize.unitName)
+		.attr('title', fileSize.unitTitle);
+}
+
+function updateBlock(image, byteCount) {
+	var isScaled = image.width != image.naturalWidth || image.height != image.naturalHeight;
+	var hasFileSize = byteCount != null;
+
+	var rendered = displayBlock.find('.ir-ext-rendered');
+	var natural = displayBlock.find('.ir-ext-natural');
+	var fileSize = displayBlock.find('.ir-ext-filesize');
+
+	updateDimensions(rendered, image.width, image.height);
+
+	if (isScaled) {
+		updateDimensions(natural, image.naturalWidth, image.naturalHeight);
+		natural.show();
+	} else {
+		natural.hide();
+		updateDimensions(natural, 0, 0);
+	}
+
+	if (hasFileSize) {
+		updateFileSize(fileSize, byteCount);
+		fileSize.show();
+	} else {
+		fileSize.hide();
+		updateFileSize(fileSize, 0);
+	}
+}
+
+$(document.body).on('mouseover', 'img', function(e) {
+	if (isMetaKey(e) && isVisible(displayBlock)) {
+		return;
+	}
+
 	var image = this;
 	var imageSource = this.src;
 
 	if (showFileSize == 'on') {
-		var requestSize = $.ajax({
+		$.ajax({
 			type: 'HEAD',
 			url: imageSource,
-			success: function() {
-				var fileSizeBytes = requestSize.getResponseHeader('Content-length');
-
-				function updateBlock(context) {
-					displayBlock.text(image.width + 'x' + image.height + ' | ' + context);
-					if (image.width != image.naturalWidth || image.height != image.naturalHeight) {
-						displayBlock.text(image.width + 'x' + image.height + ' (' + image.naturalWidth + 'x' + image.naturalHeight + ')' + ' | ' + context);
-					}
-				}
-
-				if (fileSizeBytes < 1024) {
-					updateBlock(fileSizeBytes + ' B');
-				} else if (fileSizeBytes / 1024 < 1024) {
-					updateBlock((fileSizeBytes / 1024).toFixed(2) + ' Kb');
-				} else {
-					updateBlock((fileSizeBytes / 1048576).toFixed(2) + ' Mb');
-				}
+			success: function(data, textStatus, jqXHR) {
+				updateBlock(image, getByteCount(imageSource, jqXHR));
 			}
-
-		});	
+		});
 	}
 
-	displayBlock.text(this.width + 'x' + this.height);
-	if (this.width != this.naturalWidth || this.height != this.naturalHeight) {
-		displayBlock.text(this.width + 'x' + this.height + ' (' + this.naturalWidth + 'x' + this.naturalHeight + ')');
-	}
-	$(displayBlock).fadeIn(70);
+	updateBlock(image, null);
+
+	displayBlock.fadeIn(70);
 });
 
-$('img').on('mouseleave', function() {
-	$(displayBlock).fadeOut(10);
+$(document.body).on('mouseout', 'img', function(e) {
+	if (isMetaKey(e)) {
+		return;
+	}
+	displayBlock.fadeOut(10);
 });
